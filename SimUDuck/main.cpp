@@ -4,10 +4,30 @@
 
 using namespace std;
 
+class FlyBehavior {
+public:
+    virtual void fly() = 0;
+};
+
+class FlyWithWings : public FlyBehavior {
+public:
+    void fly() override {
+        cout << "I'm flying!!!\n";
+    }
+};
+
+class FlyNoWay : public FlyBehavior {
+public:
+    void fly() override {
+        cout << "I can't fly\n";
+    }
+};
+
 class Duck {
 public:
-    Duck(string name)
-        : name_(move(name)) {
+    Duck(string name, FlyBehavior* flyBehavior)
+        : name_(move(name))
+        , flyBehavior_(flyBehavior) {
     }
 
     void getName() {
@@ -22,20 +42,23 @@ public:
         cout << "I'm swimming\n";
     };
 
-    void fly() {
-        cout << "I'm flying!!!\n";
+    void performFly() {
+        if (flyBehavior_) {
+            flyBehavior_->fly();
+        }
     }
 
     virtual void display() = 0;
 
 private:
     string name_;
+    unique_ptr<FlyBehavior> flyBehavior_;
 };
 
 class RedheadDuck : public Duck {
 public:
     RedheadDuck(string name)
-        : Duck(move(name)) {
+        : Duck(move(name), new FlyWithWings()) {
     }
 
     void display() override {
@@ -46,7 +69,7 @@ public:
 class MallardDuck : public Duck {
 public:
     MallardDuck(string name)
-        : Duck(move(name)) {
+        : Duck(move(name), new FlyWithWings()) {
     }
 
     void display() override {
@@ -57,7 +80,7 @@ public:
 class RubberDuck : public Duck {
 public:
     RubberDuck(string name)
-        : Duck(move(name)) {
+        : Duck(move(name), new FlyNoWay()) {
     }
 
     void display() override {
@@ -81,7 +104,7 @@ int main() {
         duck->display();
         duck->swim();
         duck->quack();
-        duck->fly();
+        duck->performFly();
         cout << '\n';
     }
 
