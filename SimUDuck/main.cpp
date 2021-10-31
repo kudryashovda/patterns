@@ -23,6 +23,13 @@ public:
     }
 };
 
+class FlyRocketPowered : public FlyBehavior {
+public:
+    void fly() override {
+        cout << "I’m flying with a rocket!\n";
+    }
+};
+
 class QuackBehavior {
 public:
     virtual void quack() = 0;
@@ -78,6 +85,10 @@ public:
     }
 
     virtual void display() = 0;
+
+    void setFlyBehavior(FlyBehavior* fb) {
+        flyBehavior_ = move(unique_ptr<FlyBehavior>(fb));
+    }
 
 private:
     string name_;
@@ -135,6 +146,10 @@ int main() {
     ducks.emplace_back(new MallardDuck("Tom"s));
     ducks.emplace_back(new RubberDuck("Mark"s));
     ducks.emplace_back(new WoodDuck("Alice"s));
+
+    unique_ptr<Duck> super_wood_duck(new WoodDuck("SuperDuck"s));
+    super_wood_duck->setFlyBehavior(new FlyRocketPowered());
+    ducks.emplace_back(move(super_wood_duck));
 
     for (const auto& duck : ducks) {
         duck->getName();
