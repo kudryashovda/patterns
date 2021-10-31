@@ -17,6 +17,11 @@ public:
     void swim() {
         cout << name_ << ": WouWou\n";
     };
+
+    void fly() {
+        cout << name_ << ": I'm flying!!!\n";
+    }
+
     virtual void display() = 0;
 
 private:
@@ -71,6 +76,7 @@ int main() {
         duck->display();
         duck->swim();
         duck->quack();
+        duck->fly();
         cout << '\n';
     }
 
