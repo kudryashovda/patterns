@@ -10,16 +10,20 @@ public:
         : name_(move(name)) {
     }
 
+    void getName() {
+        cout << "I'm " << name_ << '\n';
+    }
+
     void quack() {
-        cout << name_ << ": QwaQwa\n";
+        cout << "QwaQwa\n";
     };
 
     void swim() {
-        cout << name_ << ": WouWou\n";
+        cout << "I'm swimming\n";
     };
 
     void fly() {
-        cout << name_ << ": I'm flying!!!\n";
+        cout << "I'm flying!!!\n";
     }
 
     virtual void display() = 0;
@@ -35,7 +39,7 @@ public:
     }
 
     void display() override {
-        cout << "RedheadDuck\n";
+        cout << "I'm a RedheadDuck\n";
     }
 };
 
@@ -46,7 +50,7 @@ public:
     }
 
     void display() override {
-        cout << "MallardDuck\n";
+        cout << "I'm a MallardDuck\n";
     }
 };
 
@@ -57,7 +61,7 @@ public:
     }
 
     void display() override {
-        cout << "RubberDuck\n";
+        cout << "I'm a RubberDuck\n";
     }
 };
 
@@ -73,6 +77,7 @@ int main() {
     ducks.emplace_back(new RubberDuck("Jason"s));
 
     for (const auto& duck : ducks) {
+        duck->getName();
         duck->display();
         duck->swim();
         duck->quack();
