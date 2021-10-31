@@ -23,20 +23,43 @@ public:
     }
 };
 
+class QuackBehavior {
+public:
+    virtual void quack() = 0;
+};
+
+class Quack : public QuackBehavior {
+public:
+    void quack() override {
+        cout << "Quack!!!\n";
+    }
+};
+
+class MuteQuack : public QuackBehavior {
+public:
+    void quack() override {
+        cout << "<< Silence >>\n";
+    }
+};
+
+class Squeak : public QuackBehavior {
+public:
+    void quack() override {
+        cout << "Squeak\n";
+    }
+};
+
 class Duck {
 public:
-    Duck(string name, FlyBehavior* flyBehavior)
+    Duck(string name, FlyBehavior* flyBehavior, QuackBehavior* quackBehavior)
         : name_(move(name))
-        , flyBehavior_(flyBehavior) {
+        , flyBehavior_(flyBehavior)
+        , quackBehavior_(quackBehavior) {
     }
 
     void getName() {
         cout << "I'm " << name_ << '\n';
     }
-
-    void quack() {
-        cout << "QwaQwa\n";
-    };
 
     void swim() {
         cout << "I'm swimming\n";
@@ -48,17 +71,24 @@ public:
         }
     }
 
+    void performQuack() {
+        if (quackBehavior_) {
+            quackBehavior_->quack();
+        }
+    }
+
     virtual void display() = 0;
 
 private:
     string name_;
     unique_ptr<FlyBehavior> flyBehavior_;
+    unique_ptr<QuackBehavior> quackBehavior_;
 };
 
 class RedheadDuck : public Duck {
 public:
     RedheadDuck(string name)
-        : Duck(move(name), new FlyWithWings()) {
+        : Duck(move(name), new FlyWithWings(), new Quack()) {
     }
 
     void display() override {
@@ -69,7 +99,7 @@ public:
 class MallardDuck : public Duck {
 public:
     MallardDuck(string name)
-        : Duck(move(name), new FlyWithWings()) {
+        : Duck(move(name), new FlyWithWings(), new Quack()) {
     }
 
     void display() override {
@@ -80,7 +110,7 @@ public:
 class RubberDuck : public Duck {
 public:
     RubberDuck(string name)
-        : Duck(move(name), new FlyNoWay()) {
+        : Duck(move(name), new FlyNoWay(), new Squeak()) {
     }
 
     void display() override {
@@ -88,22 +118,29 @@ public:
     }
 };
 
+class WoodDuck : public Duck {
+public:
+    WoodDuck(string name)
+        : Duck(move(name), new FlyNoWay(), new MuteQuack()) {
+    }
+
+    void display() override {
+        cout << "I'm a WoodDuck\n";
+    }
+};
+
 int main() {
     vector<unique_ptr<Duck>> ducks;
     ducks.emplace_back(new RedheadDuck("Bob"s));
-    ducks.emplace_back(new RedheadDuck("Justin"s));
-
     ducks.emplace_back(new MallardDuck("Tom"s));
-    ducks.emplace_back(new MallardDuck("Anton"s));
-
     ducks.emplace_back(new RubberDuck("Mark"s));
-    ducks.emplace_back(new RubberDuck("Jason"s));
+    ducks.emplace_back(new WoodDuck("Alice"s));
 
     for (const auto& duck : ducks) {
         duck->getName();
         duck->display();
         duck->swim();
-        duck->quack();
+        duck->performQuack();
         duck->performFly();
         cout << '\n';
     }
