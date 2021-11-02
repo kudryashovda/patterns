@@ -3,4 +3,4 @@ project(Patterns)
 
 # libraries
 add_subdirectory(SimUDuck)
-
+add_subdirectory(WeatherData)
