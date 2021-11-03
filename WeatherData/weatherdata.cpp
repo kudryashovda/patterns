@@ -1,8 +1,10 @@
 #include <iostream>
 #include <set>
+#include <vector>
 
 using std::cout;
 using std::set;
+using std::vector;
 
 class Observer {
 public:
@@ -54,13 +56,29 @@ public:
     }
 
     void display() override {
-        cout << "Statistics: " << temperature_ << " " << humidity_ << " " << pressure_ << '\n';
+        cout << "Avg/Max/Min: " << average_temp_ << '/' << max_temp_ << '/' << min_temp_ << '\n';
     }
 
     void update(float temp, float humidity, float pressure) override {
         temperature_ = temp;
         humidity_ = humidity;
         pressure_ = pressure;
+        temps_.push_back(temp);
+        if (temp > max_temp_) {
+            max_temp_ = temp;
+        }
+
+        if (temp < min_temp_) {
+            min_temp_ = temp;
+        }
+        float sum_temp = 0.0;
+        for (float temperature: temps_) {
+            sum_temp += temperature;
+        }
+        if (!temps_.empty()) {
+            average_temp_ = sum_temp / temps_.size();
+        }
+
         display();
     }
 
@@ -70,6 +88,11 @@ private:
     float temperature_ = 0.0;
     float humidity_ = 0.0;
     float pressure_ = 0.0;
+
+    float min_temp_ = 273;
+    float max_temp_ = -273;
+    float average_temp_ = 0.0;
+    vector<float> temps_;
 };
 
 class ForecastDisplay : public Observer, DisplayElement {
@@ -136,6 +159,8 @@ int main() {
     ForecastDisplay forecastDisplay(&weatherData);
 
     weatherData.setMeasurements(80, 65, 30.4);
+    weatherData.setMeasurements(82, 70, 30.4);
+    weatherData.setMeasurements(81, 78, 30.4);
 
     return 0;
 }
