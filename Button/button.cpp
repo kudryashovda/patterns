@@ -11,7 +11,7 @@ public:
             func_();
         }
     }
-    void bind(function<void()> func) {
+    void bind(const function<void()>& func) {
         func_ = func;
     }
 
