@@ -3,14 +3,14 @@
 #include <vector>
 
 using std::cout;
+using std::make_unique;
 using std::string;
 using std::unique_ptr;
-using std::make_unique;
 using std::vector;
 
 class Beverage {
 public:
-    string getDescription() {
+    virtual string getDescription() {
         return description_;
     }
 
@@ -61,6 +61,71 @@ public:
     }
 };
 
+class CondimentDecorator : public Beverage {
+protected:
+    Beverage* beverage_ = nullptr;
+};
+
+class Milk : public CondimentDecorator {
+public:
+    Milk(Beverage* beverage) {
+        beverage_ = beverage;
+    }
+
+    string getDescription() override {
+        return beverage_->getDescription() + string(", Milk");
+    }
+
+    float cost() override {
+        return beverage_->cost() + 0.10f;
+    }
+};
+
+class Mocha : public CondimentDecorator {
+public:
+    Mocha(Beverage* beverage) {
+        beverage_ = beverage;
+    }
+
+    string getDescription() override {
+        return beverage_->getDescription() + string(", Mocha");
+    }
+
+    float cost() override {
+        return beverage_->cost() + 0.20f;
+    }
+};
+
+class Whip : public CondimentDecorator {
+public:
+    Whip(Beverage* beverage) {
+        beverage_ = beverage;
+    }
+
+    string getDescription() override {
+        return beverage_->getDescription() + string(", Whip");
+    }
+
+    float cost() override {
+        return beverage_->cost() + 0.10f;
+    }
+};
+
+class Soy : public CondimentDecorator {
+public:
+    Soy(Beverage* beverage) {
+        beverage_ = beverage;
+    }
+
+    string getDescription() override {
+        return beverage_->getDescription() + string(", Soy");
+    }
+
+    float cost() override {
+        return beverage_->cost() + 0.15f;
+    }
+};
+
 int main() {
     vector<unique_ptr<Beverage>> orders;
 
@@ -69,7 +134,18 @@ int main() {
     orders.push_back(make_unique<HouseBlend>());
     orders.push_back(make_unique<DarkRoast>());
 
-    // Problem appears if you have toppings (Milk, Mocha, Caramel) and you need to add more variants like HouseBlendWithMilk etc.
+    unique_ptr<Beverage> house_blend = make_unique<HouseBlend>();
+    orders.push_back(make_unique<Milk>(house_blend.release()));
+
+    house_blend = make_unique<HouseBlend>();
+    orders.push_back(make_unique<Whip>(house_blend.release()));
+
+    house_blend = make_unique<HouseBlend>();
+    orders.push_back(make_unique<Mocha>(house_blend.release()));
+
+    house_blend = make_unique<HouseBlend>();
+    unique_ptr<Beverage> house_blend_w_mocha = make_unique<Mocha>(house_blend.release());
+    orders.push_back(make_unique<Mocha>(house_blend_w_mocha.release()));
 
     for (const auto& beverage : orders) {
         cout << beverage->getDescription() << '\t' << beverage->cost() << '\n';
