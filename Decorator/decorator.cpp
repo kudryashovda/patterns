@@ -63,13 +63,13 @@ public:
 
 class CondimentDecorator : public Beverage {
 protected:
-    Beverage* beverage_ = nullptr;
+    unique_ptr<Beverage> beverage_;
 };
 
 class Milk : public CondimentDecorator {
 public:
-    Milk(Beverage* beverage) {
-        beverage_ = beverage;
+    Milk(unique_ptr<Beverage> beverage) {
+        beverage_ = move(beverage);
     }
 
     string getDescription() override {
@@ -83,8 +83,8 @@ public:
 
 class Mocha : public CondimentDecorator {
 public:
-    Mocha(Beverage* beverage) {
-        beverage_ = beverage;
+    Mocha(unique_ptr<Beverage> beverage) {
+        beverage_ = move(beverage);
     }
 
     string getDescription() override {
@@ -98,8 +98,8 @@ public:
 
 class Whip : public CondimentDecorator {
 public:
-    Whip(Beverage* beverage) {
-        beverage_ = beverage;
+    Whip(unique_ptr<Beverage> beverage) {
+        beverage_ = move(beverage);
     }
 
     string getDescription() override {
@@ -113,8 +113,8 @@ public:
 
 class Soy : public CondimentDecorator {
 public:
-    Soy(Beverage* beverage) {
-        beverage_ = beverage;
+    Soy(unique_ptr<Beverage> beverage) {
+        beverage_ = move(beverage);
     }
 
     string getDescription() override {
@@ -126,6 +126,25 @@ public:
     }
 };
 
+class Caramel : public CondimentDecorator {
+public:
+    Caramel(unique_ptr<Beverage> beverage) {
+        beverage_ = move(beverage);
+    }
+
+    string getDescription() override {
+        return beverage_->getDescription() + string(", Caramel");
+    }
+
+    float cost() override {
+        return beverage_->cost() + 0.15f;
+    }
+};
+
+#define M_MakeEspresso make_unique<Espresso>()
+#define M_AddMocha(X) make_unique<Mocha>(X)
+#define M_AddMilk(X) make_unique<Milk>(X)
+
 int main() {
     vector<unique_ptr<Beverage>> orders;
 
@@ -134,18 +153,13 @@ int main() {
     orders.push_back(make_unique<HouseBlend>());
     orders.push_back(make_unique<DarkRoast>());
 
-    unique_ptr<Beverage> house_blend = make_unique<HouseBlend>();
-    orders.push_back(make_unique<Milk>(house_blend.release()));
+    orders.push_back(make_unique<Milk>(make_unique<HouseBlend>()));
+    orders.push_back(make_unique<Whip>(make_unique<Decaf>()));
+    orders.push_back(make_unique<Mocha>(make_unique<HouseBlend>()));
 
-    house_blend = make_unique<HouseBlend>();
-    orders.push_back(make_unique<Whip>(house_blend.release()));
-
-    house_blend = make_unique<HouseBlend>();
-    orders.push_back(make_unique<Mocha>(house_blend.release()));
-
-    house_blend = make_unique<HouseBlend>();
-    unique_ptr<Beverage> house_blend_w_mocha = make_unique<Mocha>(house_blend.release());
-    orders.push_back(make_unique<Mocha>(house_blend_w_mocha.release()));
+    orders.push_back(make_unique<Milk>(make_unique<Mocha>(make_unique<Espresso>())));
+    // or with macro
+    orders.push_back(M_AddMilk(M_AddMocha(M_MakeEspresso)));
 
     for (const auto& beverage : orders) {
         cout << beverage->getDescription() << '\t' << beverage->cost() << '\n';
