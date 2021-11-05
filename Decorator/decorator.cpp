@@ -69,6 +69,8 @@ int main() {
     orders.push_back(make_unique<HouseBlend>());
     orders.push_back(make_unique<DarkRoast>());
 
+    // Problem appears if you have toppings (Milk, Mocha, Caramel) and you need to add more variants like HouseBlendWithMilk etc.
+
     for (const auto& beverage : orders) {
         cout << beverage->getDescription() << '\t' << beverage->cost() << '\n';
     }
