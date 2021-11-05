@@ -11,8 +11,8 @@ public:
             func_();
         }
     }
-    void bind(const function<void()>& func) {
-        func_ = func;
+    void bind(function<void()>&& func) {
+        func_ = move(func);
     }
 
 private:
@@ -36,6 +36,10 @@ int main() {
     btn1.bind(onBtn1Click);
     btn2.bind(onBtn2Click);
     btn3.bind([]() { cout << "btn3 was clicked\n"; });
+
+    btn1.click();
+    btn2.click();
+    btn3.click();
 
     btn1.click();
     btn2.click();
