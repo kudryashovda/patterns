@@ -47,6 +47,8 @@ unique_ptr<Pizza> orderPizza(PizzaType pizza_type) {
     case PizzaType::pepperoni:
         pizza = make_unique<PepperoniPizza>();
         break;
+    default:
+        return pizza; // nullptr
     }
 
     pizza->prepare();
@@ -59,6 +61,9 @@ unique_ptr<Pizza> orderPizza(PizzaType pizza_type) {
 
 int main() {
     auto order = orderPizza(PizzaType::cheese);
+    if (!order) {
+        return -1;
+    }
 
     return 0;
 }
