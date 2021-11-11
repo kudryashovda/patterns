@@ -33,37 +33,54 @@ public:
     void prepare() override{};
 };
 
-unique_ptr<Pizza> orderPizza(PizzaType pizza_type) {
-    unique_ptr<Pizza> pizza;
+class SimplePizzaFactory {
+public:
+    unique_ptr<Pizza> createPizza(PizzaType pizza_type) {
+        unique_ptr<Pizza> pizza;
 
-    // this is a problem - if you wish to add or remove some pizza types - you'll have to change this code
-    switch (pizza_type) {
-    case PizzaType::cheese:
-        pizza = make_unique<CheesePizza>();
-        break;
-    case PizzaType::greek:
-        pizza = make_unique<GreekPizza>();
-        break;
-    case PizzaType::pepperoni:
-        pizza = make_unique<PepperoniPizza>();
-        break;
-    default:
-        return pizza; // nullptr
+        switch (pizza_type) {
+        case PizzaType::cheese:
+            pizza = make_unique<CheesePizza>();
+            break;
+        case PizzaType::greek:
+            pizza = make_unique<GreekPizza>();
+            break;
+        case PizzaType::pepperoni:
+            pizza = make_unique<PepperoniPizza>();
+            break;
+        }
+
+        return pizza;
+    }
+};
+
+class PizzaStore {
+public:
+    PizzaStore(SimplePizzaFactory* factory)
+        : factory_(factory) {
     }
 
-    pizza->prepare();
-    pizza->bake();
-    pizza->cut();
-    pizza->box();
+    unique_ptr<Pizza> orderPizza(PizzaType pizza_type) {
+        unique_ptr<Pizza> pizza = factory_->createPizza(pizza_type);
 
-    return pizza;
-}
+        pizza->prepare();
+        pizza->bake();
+        pizza->cut();
+        pizza->box();
+
+        return pizza;
+    }
+
+private:
+    SimplePizzaFactory* factory_;
+};
 
 int main() {
-    auto order = orderPizza(PizzaType::cheese);
-    if (!order) {
-        return -1;
-    }
+    SimplePizzaFactory factory;
+
+    PizzaStore pizza_store(&factory);
+
+    const auto pizza = pizza_store.orderPizza(PizzaType::pepperoni);
 
     return 0;
 }
