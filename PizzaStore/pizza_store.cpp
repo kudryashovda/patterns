@@ -54,6 +54,12 @@ public:
     }
 };
 
+// Problem:
+// nyStore -> NYPizzaFactory
+// chicagoStore -> ChicagoPizzaFactory
+
+// every store has it own sequence of pizza recipe
+
 class PizzaStore {
 public:
     PizzaStore(SimplePizzaFactory* factory)
