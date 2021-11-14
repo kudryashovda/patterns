@@ -72,6 +72,10 @@ public:
     }
 };
 
+// Problem:
+// Sauce, dough and toppings are made from definite base components, but not here
+// Every time we relay on pizzeria products
+
 class NYStyleGreekPizza : public Pizza {
 };
 
