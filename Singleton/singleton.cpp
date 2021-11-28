@@ -1,29 +1,30 @@
 #include <iostream>
+#include <memory>
+
+using namespace std;
 
 class Singleton {
 public:
-    static Singleton* getInstance() {
+    static unique_ptr<Singleton> getInstance() {
         if (!instance) {
-            instance = new Singleton();
+            instance = unique_ptr<Singleton>(new Singleton());
         }
-        return instance;
+        return move(instance);
     }
     int GetMagicNumber() {
         return 12345;
     }
 private:
     Singleton() = default;
-    static Singleton* instance;
+    static unique_ptr<Singleton> instance;
 };
 
-Singleton* Singleton::instance = nullptr;
+unique_ptr<Singleton> Singleton::instance = nullptr;
 
 int main() {
-    auto* props = Singleton::getInstance();
+    auto props = Singleton::getInstance();
 
     std::cout << props->GetMagicNumber() << '\n';
-
-    delete props;
 
     return 0;
 }
