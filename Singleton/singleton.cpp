@@ -5,6 +5,7 @@ using namespace std;
 class Singleton {
 public:
     static Singleton *getInstance() {
+        // Disadvantage - once started this instance lives until main program closes
         static Singleton instance;
         return &instance;
     }
