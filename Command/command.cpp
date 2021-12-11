@@ -20,6 +20,15 @@ public:
     virtual string getName() = 0;
 };
 
+class NoCommand : public Command {
+public:
+    void execute() override {
+    }
+    string getName() override {
+        return "No command";
+    }
+};
+
 class LightOnCommand : public Command {
 public:
     LightOnCommand(Light* light) {
@@ -55,9 +64,11 @@ private:
 class RemoteControl {
 public:
     RemoteControl() {
-        constexpr int programs_count = 1;
-        onCommands_.resize(programs_count);
-        offCommands_.resize(programs_count);
+        constexpr int programs_count = 7;
+        for (int i = 0; i < programs_count; ++i) {
+            onCommands_.push_back(&no_command_);
+            offCommands_.push_back(&no_command_);
+        }
     }
 
     void setCommand(int slot, Command* onCommand, Command* offCommand) {
@@ -83,6 +94,7 @@ public:
 private:
     vector<Command*> onCommands_;
     vector<Command*> offCommands_;
+    NoCommand no_command_;
 };
 
 int main() {
