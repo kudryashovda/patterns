@@ -1,17 +1,48 @@
 #include <iostream>
-#include <sstream>
 #include <vector>
 
 using namespace std;
 
 class Light {
 public:
+    Light(string location) {
+        location_ = move(location);
+    }
     void on() {
-        cout << "Light is on\n";
+        cout << location_ << " light is on\n";
     };
     void off() {
-        cout << "Light is off\n";
+        cout << location_ << " light is off\n";
     };
+
+private:
+    string location_;
+};
+
+class Stereo {
+public:
+    Stereo(string location) {
+        location_ = move(location);
+    }
+    void on() {
+        cout << location_ << " stereo is on\n";
+    };
+    void off() {
+        cout << location_ << " stereo is off\n";
+    };
+    void setCD() {
+        input_type_ = "CD";
+        cout << location_ << " stereo is set for CD input\n";
+    }
+    void setVolume(int volume) {
+        volume_ = volume;
+        cout << location_ << " stereo volume set to " << volume_ << '\n';
+    }
+
+private:
+    string location_;
+    string input_type_ = "undefined";
+    int volume_ = 0;
 };
 
 class Command {
@@ -25,7 +56,7 @@ public:
     void execute() override {
     }
     string getName() override {
-        return "No command";
+        return "NoCommand";
     }
 };
 
@@ -61,6 +92,40 @@ private:
     Light* light_;
 };
 
+class StereoOnWithCDCommand : public Command {
+public:
+    StereoOnWithCDCommand(Stereo* stereo) {
+        stereo_ = stereo;
+    }
+    void execute() override {
+        stereo_->on();
+        stereo_->setCD();
+        stereo_->setVolume(11);
+    }
+    string getName() override {
+        return "StereoOnWithCDCommand";
+    }
+
+private:
+    Stereo* stereo_;
+};
+
+class StereoOffCommand : public Command {
+public:
+    StereoOffCommand(Stereo* stereo) {
+        stereo_ = stereo;
+    }
+    void execute() override {
+        stereo_->off();
+    }
+    string getName() override {
+        return "StereoOffCommand";
+    }
+
+private:
+    Stereo* stereo_;
+};
+
 class RemoteControl {
 public:
     RemoteControl() {
@@ -81,14 +146,11 @@ public:
     void offButtonWasPressed(int slot) {
         offCommands_.at(slot)->execute();
     }
-    string toString() {
-        stringstream ss;
-        ss << "\n------ Remote Control ------\n";
+    void printCommands() {
+        cout << "\n------ Remote Control ------\n";
         for (int i = 0; i < onCommands_.size(); ++i) {
-            ss << "[slot " << i << "] " << onCommands_[i]->getName() << "    " << offCommands_[i]->getName() << "\n";
+            cout << "[slot " << i << "] " << onCommands_[i]->getName() << '\t' << offCommands_[i]->getName() << "\n";
         }
-
-        return ss.str();
     }
 
 private:
@@ -99,15 +161,24 @@ private:
 
 int main() {
     RemoteControl remote;
-    Light light;
-    LightOnCommand lightOn(&light);
-    LightOffCommand lightOff(&light);
 
-    remote.setCommand(0, &lightOn, &lightOff);
+    Light livingRoomLight("Living Room");
+    LightOnCommand livingRoomLightOn(&livingRoomLight);
+    LightOffCommand livingRoomLightOff(&livingRoomLight);
+
+    Stereo stereo("Living Room");
+    StereoOnWithCDCommand stereoOnWithCdCommand(&stereo);
+    StereoOffCommand stereoOffCommand(&stereo);
+
+    remote.setCommand(0, &livingRoomLightOn, &livingRoomLightOff);
+    remote.setCommand(3, &stereoOnWithCdCommand, &stereoOffCommand);
+
+    remote.printCommands();
 
     remote.onButtonWasPressed(0);
     remote.offButtonWasPressed(0);
-    cout << remote.toString();
+    remote.onButtonWasPressed(3);
+    remote.offButtonWasPressed(3);
 
     return 0;
 }
