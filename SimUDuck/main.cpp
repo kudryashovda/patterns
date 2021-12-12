@@ -140,6 +140,47 @@ public:
     }
 };
 
+class Turkey {
+public:
+    virtual void gobble() = 0;
+    virtual void fly() = 0;
+    virtual string getName() const = 0;
+};
+
+class WildTurkey : public Turkey {
+public:
+    WildTurkey(string name)
+        : name_(move(name)) {
+    }
+    void gobble() override {
+        cout << "Gobble gobble" << '\n';
+    }
+    void fly() override {
+        cout << "I'm flying a short distance" << '\n';
+    }
+    string getName() const override {
+        return name_;
+    }
+
+private:
+    string name_;
+};
+
+class TurkeyAdapter : public Duck {
+public:
+    TurkeyAdapter(Turkey* turkey)
+        : Duck(turkey->getName(), new FlyWithWings(), new Quack()) {
+        turkey_ = turkey;
+    }
+
+    void display() override {
+        cout << "I am turkey adaptor" << '\n';
+    }
+
+private:
+    Turkey* turkey_;
+};
+
 int main() {
     vector<unique_ptr<Duck>> ducks;
     ducks.emplace_back(new RedheadDuck("Bob"s));
@@ -150,6 +191,10 @@ int main() {
     unique_ptr<Duck> super_wood_duck(new WoodDuck("SuperDuck"s));
     super_wood_duck->setFlyBehavior(new FlyRocketPowered());
     ducks.emplace_back(move(super_wood_duck));
+
+    WildTurkey wildTurkey("Pups");
+    unique_ptr<TurkeyAdapter> turkeyAdapter(new TurkeyAdapter(&wildTurkey));
+    ducks.emplace_back(move(turkeyAdapter));
 
     for (const auto& duck : ducks) {
         duck->getName();
