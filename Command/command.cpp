@@ -63,6 +63,29 @@ public:
     }
 };
 
+class MacroCommand : public Command {
+public:
+    MacroCommand(vector<Command*> commands) {
+        commands_ = move(commands);
+    }
+    void execute() override {
+        for (const auto& command : commands_) {
+            command->execute();
+        }
+    }
+    void undo() override {
+        for (const auto& command : commands_) {
+            command->undo();
+        }
+    }
+    string getName() override {
+        return "MacroCommand";
+    }
+
+private:
+    vector<Command*> commands_;
+};
+
 class LightOnCommand : public Command {
 public:
     LightOnCommand(Light* light) {
@@ -192,18 +215,16 @@ int main() {
     StereoOnWithCDCommand stereoOnWithCdCommand(&stereo);
     StereoOffCommand stereoOffCommand(&stereo);
 
-    remote.setCommand(0, &livingRoomLightOn, &livingRoomLightOff);
-    remote.setCommand(3, &stereoOnWithCdCommand, &stereoOffCommand);
+    vector<Command*> partyOn = { &livingRoomLightOn, &stereoOnWithCdCommand };
+    vector<Command*> partyOff = { &livingRoomLightOff, &stereoOffCommand };
 
-    remote.printCommands();
+    MacroCommand partyOnMacro(partyOn);
+    MacroCommand partyOffMacro(partyOff);
+
+    remote.setCommand(0, &partyOnMacro, &partyOffMacro);
 
     remote.onButtonWasPressed(0);
-    remote.offButtonWasPressed(0);
-    remote.onButtonWasPressed(3);
-    remote.offButtonWasPressed(3);
     remote.undoButtonWasPushed();
-
-    remote.printCommands();
 
     return 0;
 }
