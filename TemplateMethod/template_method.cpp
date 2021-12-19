@@ -2,50 +2,40 @@
 
 using namespace std;
 
-// less duplicated code
-
 class CaffeineBeverage {
 public:
-    virtual void prepareRecipe() = 0;
-    virtual void boilWater() {
+    void prepareRecipe() {
+        boilWater();
+        brew();
+        pourInCup();
+        addCondiments();
+    }
+    void boilWater() {
         cout << "Boiling water" << '\n';
     }
-    virtual void pourInCup() {
+    virtual void brew() = 0;
+    virtual void addCondiments() = 0;
+    void pourInCup() {
         cout << "Pouring into cup" << '\n';
     }
 };
 
 class Coffee : public CaffeineBeverage {
 public:
-    void prepareRecipe() override {
-        boilWater();
-        brewCoffeeGrinds();
-        pourInCup();
-        addSugarAndMilk();
-    }
-
-    void brewCoffeeGrinds() {
+    void brew() override {
         cout << "Dripping Coffee through" << '\n';
     }
-
-    void addSugarAndMilk() {
+    void addCondiments() override {
         cout << "Adding Sugar and Milk" << '\n';
     }
 };
 
 class Tea : public CaffeineBeverage {
 public:
-    void prepareRecipe() override {
-        boilWater();
-        steepTeaBag();
-        pourInCup();
-        addLemon();
-    }
-
-    void steepTeaBag() {
+    void brew() override {
         cout << "Steering the tea" << '\n';
     }
-    void addLemon() {
+    void addCondiments() override {
         cout << "Adding lemon" << '\n';
     }
 };
