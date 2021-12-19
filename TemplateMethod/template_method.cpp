@@ -9,6 +9,7 @@ public:
         brew();
         pourInCup();
         addCondiments();
+        hook();
     }
     void boilWater() {
         cout << "Boiling water" << '\n';
@@ -18,6 +19,7 @@ public:
     void pourInCup() {
         cout << "Pouring into cup" << '\n';
     }
+    virtual void hook() {}
 };
 
 class Coffee : public CaffeineBeverage {
@@ -39,6 +41,19 @@ public:
         cout << "Adding lemon" << '\n';
     }
 };
+
+class TeaWithHook : public CaffeineBeverage {
+public:
+    void brew() override {
+        cout << "Steering the tea" << '\n';
+    }
+    void addCondiments() override {
+        cout << "Adding lemon" << '\n';
+    }
+    void hook() override {
+        cout << "Make some post-prepare steps" << '\n';
+    }
+};
 int main() {
 
     cout << "Welcome to out cafeteria" << '\n';
@@ -50,6 +65,11 @@ int main() {
     cout << '\n';
     cout << "Preparing coffee" << '\n';
     coffee.prepareRecipe();
+
+    TeaWithHook teaWithHook;
+    cout << '\n';
+    cout << "Preparing tea with secret" << '\n';
+    teaWithHook.prepareRecipe();
 
     return 0;
 }
